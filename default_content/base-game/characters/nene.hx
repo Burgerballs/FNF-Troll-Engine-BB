@@ -238,7 +238,7 @@ function onCharacterUpdate(e) {
 		}
 	}else{
 		for (i in 0...abotVis.members.length) 
-			abotVis.members[i].animation.curAnim.curFrame = Math.round(FlxMath.fastSin(visOffset + i) * 2.5 + 2.5);
+			abotVis.members[i].animation.curAnim.curFrame = Math.round(Math.sin(visOffset + i) * 2.5 + 2.5);
 		
 	}
 

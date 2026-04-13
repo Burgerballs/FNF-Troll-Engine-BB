@@ -560,7 +560,7 @@ class OptionsSubstate extends MusicBeatSubstate
 			color2
 		));
 		if (FlxG.width - 160 < optionMenu.width + 160) optionMenu.x = Math.floor((FlxG.width - optionMenu.width)/2);
-		optionMenu.alpha = 0.6;
+		optionMenu.alpha = 1;
 		add(optionMenu);
 
 		optionCamera.width = Std.int(optionMenu.width);
@@ -574,8 +574,8 @@ class OptionsSubstate extends MusicBeatSubstate
 		optionCamera.follow(camFollowPos);
 
 		////
-		final backdropGraphic = Paths.image("optionsMenu/backdrop");
-		final backdropSlice = [22, 22, 89, 89];
+		final backdropGraphic = Paths.image('setupslice');
+		final backdropSlice = [3,3,4,4];
 		final tabButtonHeight = 32;
 
 		var lastX:Float = optionMenu.x;
@@ -590,7 +590,7 @@ class OptionsSubstate extends MusicBeatSubstate
 
 			var button = new FlxSprite(lastX, optionMenu.y - 2 - tabButtonHeight, whitePixel);
 			button.ID = idx;
-			button.alpha = 0.75;
+			button.alpha = 1;
 			
 			button.scale.set(tLength - 2, tabButtonHeight);
 			button.updateHitbox();
@@ -650,14 +650,16 @@ class OptionsSubstate extends MusicBeatSubstate
 
 					text.y += (height - text.height) / 2;
 					
-					var drop:FlxUI9SliceSprite = new FlxUI9SliceSprite(rect.x, rect.y, backdropGraphic, rect, backdropSlice);
-					drop.alpha = 0.95;
+					var drop:Cooler9Slice = new Cooler9Slice(rect.x, rect.y, backdropGraphic, new Rectangle(3, 3, 4, 4), backdropSlice);
+					drop.alpha = 1;
 					drop.cameras = [optionCamera];
 					group.add(drop);
+					drop.resize(rect.width, rect.height);
 					
-					var lock:FlxUI9SliceSprite = new FlxUI9SliceSprite(rect.x, rect.y, backdropGraphic, rect, backdropSlice);
+					var lock:Cooler9Slice = new Cooler9Slice(rect.x, rect.y, backdropGraphic, new Rectangle(3, 3, 4, 4), backdropSlice);
 					lock.cameras = [optionCamera];
-					lock.alpha = 0.75;
+					lock.color = 0xFF999999;
+					lock.resize(rect.width, rect.height);
 
 					var widget:Widget = createWidget(opt, drop, text, data);
 					widget.data.set("optionBox", drop);
@@ -772,7 +774,7 @@ class OptionsSubstate extends MusicBeatSubstate
 		{
 			case Toggle:
 				var checkbox = new Checkbox();
-				checkbox.setGraphicSize(36, 36);
+				checkbox.setGraphicSize(48, 48);
 				checkbox.updateHitbox();
 				var text = new FlxText(0, 0, 0, "off", 16);
 				text.applyFormat(TextFormats.OPT_VALUE_TEXT);
@@ -806,7 +808,7 @@ class OptionsSubstate extends MusicBeatSubstate
 				ddCamera.bgColor.alpha = 204;
 				camerasToRemove.push(ddCamera);
 
-				var backdropGraphic = Paths.image("optionsMenu/backdrop");
+				var backdropGraphic = Paths.image('setupslice');
 
 				for (idx in 0...options.length) {
 					var l = options[idx];
@@ -823,7 +825,7 @@ class OptionsSubstate extends MusicBeatSubstate
 					var backDrop:FlxUI9SliceSprite = new FlxUI9SliceSprite(
 						text.x - 4, daY + 4, 
 						backdropGraphic,
-						new Rectangle(0, 0, width, height), [22, 22, 89, 89]
+						new Rectangle(0, 0, width, height), [3, 3, 4, 4]
 					);
 					backDrop.cameras = [ddCamera];
 
@@ -1778,29 +1780,41 @@ class Checkbox extends WidgetSprite
 {
 	public var toggled(default, set) = false;
 
+	function animEnded(name:String) {
+		if (name == 'TURN') {
+			animation.play('idle');
+		} else if (name == 'RTURN') {
+			animation.play('toggled');
+		}
+	}
+
 	function set_toggled(val:Bool)
 	{
-		animation.play(val ? "toggled" : "idle", true);
+		animation.play(!val ? "RTURN" : "TURN", true);
 		return toggled = val;
 	}
 
 	public function new(x:Float = 0, y:Float = 0, defaultToggled:Bool = false)
 	{
 		super(x, y);
-		frames = Paths.getSparrowAtlas("optionsMenu/checkbox");
-		animation.addByPrefix("toggled", "selected", 0, false);
-		animation.addByPrefix("idle", "deselected", 0, false);
+		frames = Paths.getSparrowAtlas("optionsbuttongay");
+		animation.addByPrefix("RTURN", "RTURN", 12, false);
+		animation.addByPrefix("TURN", "TURN", 12, false);
+		animation.addByPrefix("toggled", "OFF", 12, false);
+		animation.addByPrefix("idle", "ON", 12, false);
 		animation.play("idle", true);
+		scale.set(2,2);
 
-		// antialiasing = false;
-
+		antialiasing = false;
 		toggled = defaultToggled;
+		animation.play(toggled ? "toggled" : "idle", true);
+		animation.finishCallback = animEnded;
 	}
 }
 
 class TextFormats {
 	public static final TAB_NAME:FlxTextFormatData = {
-		font: "quantico.ttf",
+		font: "helveticaib.ttf",
 		pixelPerfectRender: true,
 		antialiasing: false,
 	
@@ -1810,7 +1824,7 @@ class TextFormats {
 	};
 	
 	public static final OPT_LABEL:FlxTextFormatData = {
-		font: "vcr.ttf",
+		font: "helveticaib.ttf",
 		pixelPerfectRender: true,
 		antialiasing: false,
 	
@@ -1820,7 +1834,7 @@ class TextFormats {
 	};
 	
 	public static final OPT_NAME:FlxTextFormatData = {
-		font: "vcr.ttf",
+		font: "helveticaib.ttf",
 		
 		size: 28,
 		color: 0xFFFFFFFF,
@@ -1828,21 +1842,21 @@ class TextFormats {
 	};
 
 	public static final OPT_VALUE_TEXT:FlxTextFormatData = {
-		font: "vcr.ttf",
+		font: "helveticaib.ttf",
 		size: 24,
 		color: 0xFFFFFFFF,
 		alignment: LEFT
 	};
 	
 	public static final OPT_DROPDOWN_OPTION_TEXT:FlxTextFormatData = {
-		font: "vcr.ttf",
+		font: "helveticaib.ttf",
 		size: 24,
 		color: 0xFFFFFFFF,
 		alignment: LEFT
 	};
 
 	public static final OPT_DESC:FlxTextFormatData = {
-		font: "quantico.ttf",
+		font: "helvetica.ttf",
 		pixelPerfectRender: true,
 		antialiasing: false,
 	

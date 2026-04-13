@@ -14,7 +14,7 @@ class DrunkModifier extends NoteModifier {
 
 	inline function applyDrunk(axis:String, player:Int, time:Float, visualDiff:Float, data:Float, ?mathFunc:Float->Float){
 		if (mathFunc == null)
-			mathFunc = FlxMath.fastCos;
+			mathFunc = Math.cos;
 		var perc = axis == '' ? getValue(player) : getSubmodValue('drunk${axis}', player);
 		var speed = getSubmodValue('drunk${axis}Speed', player);
 		var period = getSubmodValue('drunk${axis}Period', player);
@@ -30,7 +30,7 @@ class DrunkModifier extends NoteModifier {
 	inline function applyTipsy(axis:String, player:Int, time:Float, visualDiff:Float, data:Float, ?mathFunc:Float->Float)
 	{
 		if(mathFunc == null)
-			mathFunc = FlxMath.fastCos;
+			mathFunc = Math.cos;
 
 		var perc = getSubmodValue('tipsy${axis}', player);
 		var speed = getSubmodValue('tipsy${axis}Speed', player);
@@ -44,7 +44,7 @@ class DrunkModifier extends NoteModifier {
 
 	inline function applyBumpy(axis:String, player:Int, time:Float, visualDiff:Float, data:Float, ?mathFunc:Float->Float){
 		if (mathFunc == null)
-			mathFunc = FlxMath.fastSin;
+			mathFunc = Math.sin;
 		var perc = getSubmodValue('bumpy${axis}', player);
 		var period = getSubmodValue('bumpy${axis}Period', player);
 		var offset = getSubmodValue('bumpy${axis}Offset', player);

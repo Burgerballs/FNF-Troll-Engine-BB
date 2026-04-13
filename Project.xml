@@ -155,6 +155,7 @@
 	-->
 	<haxedef name="BBTE_BURGERBALLS_SIGNATURE" />
 
+	<assets path="flixel/flixel-ui/img" embed="true"/>
 	<!-- 
 	Used for mods with V-Slice visuals.
 

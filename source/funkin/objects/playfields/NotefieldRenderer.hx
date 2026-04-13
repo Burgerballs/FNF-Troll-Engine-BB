@@ -164,8 +164,10 @@ class NotefieldRenderer extends FlxBasic {
 						transforms[n].alphaMultiplier = alphas[n] * multAlpha;
 				}
 			}
+			object = null;
 		}
 
+		finalDrawQueue = [];
 	}
 
 	override function update(elapsed:Float){

@@ -96,6 +96,13 @@ Enabling Quants will change the logic to visualise the colors of the judgement y
 				value: true,
 				data: []
 			},
+			"pressGlowIgnore" => {
+				display: "Ignore Press upon Glow Anim",
+				desc: "When toggled, the 'pressed' animation for notes do not play when the glow anim happens to be playing.",
+				type: Toggle,
+				value: true,
+				data: []
+			},
 			"directionalCam" => {
 				display: "Directional Camera",
 				desc: "When toggled, the camera will move with the focused character's animations",
@@ -507,7 +514,7 @@ Enabling Quants will change the logic to visualise the colors of the judgement y
 						"Wife3",
 						"PBot",
 						"BBE2Complex", // self indulgence
-						"SuperBBE2Complex"
+						"SuperBBE2Complex" // Superself indulgence
 					]
 				]
 			},
@@ -519,6 +526,13 @@ Enabling Quants will change the logic to visualise the colors of the judgement y
 				data: []
 			},
 			"noteSplashes" => {
+				display: "Note Splashes",
+				desc: "When toggled, hitting top judgements will cause particles to spawn.",
+				type: Toggle,
+				value: true,
+				data: []
+			},
+			"simplicity" => {
 				display: "Note Splashes",
 				desc: "When toggled, hitting top judgements will cause particles to spawn.",
 				type: Toggle,
@@ -752,6 +766,7 @@ Enabling Quants will change the logic to visualise the colors of the judgement y
 					value: true,
 					data: ["requiresRestart" => true]
 				},
+				what casualite asked you to add THIS one holy shit
 			 */
 			#if FUNNY_ALLOWED
 			"ruin" => {

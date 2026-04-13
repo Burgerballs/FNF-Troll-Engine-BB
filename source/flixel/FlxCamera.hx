@@ -1,5 +1,6 @@
 package flixel;
 
+import openfl.display.OpenGLRenderer;
 import funkin.objects.shaders.NoteColorSwap;
 import funkin.ClientPrefs;
 
@@ -47,6 +48,7 @@ private typedef FlxDrawItem = flixel.graphics.tile.FlxDrawQuadsItem;
  */
 class FlxCamera extends FlxBasic
 {
+	public static var renderer:OpenGLRenderer;
 	/**
 	 * Any `FlxCamera` with a zoom of 0 (the default value) will have this zoom value.
 	 */
@@ -360,7 +362,7 @@ class FlxCamera extends FlxBasic
 	 * Helper matrix object. Used in blit render mode when camera's zoom is less than initialZoom
 	 * (it is applied to all objects rendered on the camera at such circumstances).
 	 */
-	var _blitMatrix:FlxMatrix = new FlxMatrix();
+	var _blitMatrix:FlxMatrix = FlxMatrix.get();
 
 	/**
 	 * Logical flag for tracking whether to apply _blitMatrix transformation to objects or not.
@@ -572,7 +574,7 @@ class FlxCamera extends FlxBasic
 	public var debugLayer:Sprite;
 	#end
 
-	var _helperMatrix:FlxMatrix = new FlxMatrix();
+	var _helperMatrix:FlxMatrix = FlxMatrix.get();
 
 	var _helperPoint:Point = new Point();
 
@@ -884,94 +886,12 @@ class FlxCamera extends FlxBasic
 	public function drawTriangles(graphic:FlxGraphic, vertices:DrawData<Float>, indices:DrawData<Int>, uvtData:DrawData<Float>, ?colors:DrawData<Int>,
 			?position:FlxPoint, ?blend:BlendMode, repeat:Bool = false, smoothing:Bool = false, ?transform:ColorTransform, ?shader:FlxShader, ?colorSwap:NoteColorSwap):Void
 	{
-		if (FlxG.renderBlit)
-		{
-			if (position == null)
-				position = renderPoint.set();
-
-			_bounds.set(0, 0, width, height);
-
-			var verticesLength:Int = vertices.length;
-			var currentVertexPosition:Int = 0;
-
-			var tempX:Float, tempY:Float;
-			var i:Int = 0;
-			var bounds = renderRect.set();
-			drawVertices.splice(0, drawVertices.length);
-
-			while (i < verticesLength)
-			{
-				tempX = position.x + vertices[i];
-				tempY = position.y + vertices[i + 1];
-
-				drawVertices[currentVertexPosition++] = tempX;
-				drawVertices[currentVertexPosition++] = tempY;
-
-				if (i == 0)
-				{
-					bounds.set(tempX, tempY, 0, 0);
-				}
-				else
-				{
-					FlxDrawTrianglesItem.inflateBounds(bounds, tempX, tempY);
-				}
-
-				i += 2;
-			}
-
-			position.putWeak();
-
-			if (!_bounds.overlaps(bounds))
-			{
-				drawVertices.splice(drawVertices.length - verticesLength, verticesLength);
-			}
-			else
-			{
-				trianglesSprite.graphics.clear();
-				trianglesSprite.graphics.beginBitmapFill(graphic.bitmap, null, repeat, smoothing);
-				trianglesSprite.graphics.drawTriangles(drawVertices, indices, uvtData);
-				trianglesSprite.graphics.endFill();
-
-				// TODO: check this block of code for cases, when zoom < 1 (or initial zoom?)...
-				if (_useBlitMatrix)
-					_helperMatrix.copyFrom(_blitMatrix);
-				else
-				{
-					_helperMatrix.identity();
-					_helperMatrix.translate(-viewMarginLeft, -viewMarginTop);
-				}
-
-				buffer.draw(trianglesSprite, _helperMatrix);
-				#if FLX_DEBUG
-				if (FlxG.debugger.drawDebug)
-				{
-					var gfx:Graphics = FlxSpriteUtil.flashGfx;
-					gfx.clear();
-					gfx.lineStyle(1, FlxColor.BLUE, 0.5);
-					gfx.drawTriangles(drawVertices, indices);
-					buffer.draw(FlxSpriteUtil.flashGfxSprite, _helperMatrix);
-				}
-				#end
-				// End of TODO...
-			}
-
-			bounds.put();
-		}
-		else
-		{
-			_bounds.set(0, 0, width, height);
-			var isColored:Bool = (colors != null && colors.length != 0);
-
-			#if !flash
-			var hasColorOffsets:Bool = (transform != null && transform.hasRGBAOffsets());
-			isColored = isColored || (transform != null && transform.hasRGBMultipliers());
-			var drawItem:FlxDrawTrianglesItem = startTrianglesBatch(graphic, smoothing, isColored, blend, hasColorOffsets, shader);
-			drawItem.addTriangles(vertices, indices, uvtData, colors, position, _bounds, transform, colorSwap);
-			#else
-			var drawItem:FlxDrawTrianglesItem = startTrianglesBatch(graphic, smoothing, isColored, blend);
-			drawItem.addTriangles(vertices, indices, uvtData, colors, position, _bounds);
-			#end
-		}
+		_bounds.set(0, 0, width, height);
+		var isColored:Bool = (colors != null && colors.length != 0);
+		var hasColorOffsets:Bool = (transform != null && transform.hasRGBAOffsets());
+		isColored = isColored || (transform != null && transform.hasRGBMultipliers());
+		var drawItem:FlxDrawTrianglesItem = startTrianglesBatch(graphic, smoothing, isColored, blend, hasColorOffsets, shader);
+		drawItem.addTriangles(vertices, indices, uvtData, colors, position, _bounds, transform, colorSwap);
 	}
 
 	/**
@@ -1489,7 +1409,7 @@ class FlxCamera extends FlxBasic
 				_helperMatrix.identity();
 				_helperMatrix.translate(-width * 0.5, -height * 0.5);
 				_helperMatrix.scale(scaleX, scaleY);
-				_helperMatrix.rotateWithTrig(FlxMath.fastCos(scrollAngle * 0.0174533), FlxMath.fastSin(scrollAngle * 0.0174533));
+				_helperMatrix.rotateWithTrig(Math.cos(scrollAngle * 0.0174533), Math.sin(scrollAngle * 0.0174533));
 				_helperMatrix.translate(width * 0.5, height * 0.5);
 				if (!positionMovesSprite)_helperMatrix.translate(x, y);
 				_helperMatrix.scale(FlxG.scaleMode.scale.x, FlxG.scaleMode.scale.y);

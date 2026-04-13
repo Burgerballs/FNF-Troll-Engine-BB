@@ -3,8 +3,6 @@ package funkin.modchart.modifiers;
 import math.CoolMath;
 import math.CoolMath.triangle;
 import math.CoolMath.square;
-import flixel.math.FlxMath.fastSin as sin;
-import flixel.math.FlxMath.fastCos as cos;
 import math.CoolMath.fastTan as tan;
 class PathModifier extends NoteModifier
 {	
@@ -59,7 +57,7 @@ class PathModifier extends NoteModifier
 			var offset = getSubmodValue("bounceOffset", player);
 			var period = getSubmodValue("bouncePeriod", player);
 			if (period != -1.0){
-				var bounce = Math.abs(sin((diff + offset) / (90.0 + 90.0 * period)));
+				var bounce = Math.abs(Math.sin((diff + offset) / (90.0 + 90.0 * period)));
 				pos.x += bounceVal * Note.halfWidth * bounce;
 			}
 		}
@@ -69,7 +67,7 @@ class PathModifier extends NoteModifier
 			var offset = getSubmodValue("bounceZOffset", player);
 			var period = getSubmodValue("bounceZPeriod", player);
 			if (period != -1.0) {
-				var bounce = Math.abs(sin((diff + offset) / (90.0 + 90.0 * period)));
+				var bounce = Math.abs(Math.sin((diff + offset) / (90.0 + 90.0 * period)));
 				pos.z += bounceZVal * Note.halfWidth * bounce;
 			}
 		}
@@ -89,8 +87,8 @@ class PathModifier extends NoteModifier
 			var playerColumn = column % field.field.keyCount;
 			var columnPhaseShift = (playerColumn * PI_THIRD) + getSubmodValue("tornadoOffset", player);
 			var phaseShift = (diff / 135) * (1 + getSubmodValue("tornadoPeriod", player));
-			var returnReceptorToZeroOffsetX = (-cos(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
-			var offsetX = (-cos(phaseShift - columnPhaseShift) + 1) * Note.halfWidth * keyCunt - returnReceptorToZeroOffsetX;
+			var returnReceptorToZeroOffsetX = (-Math.cos(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
+			var offsetX = (-Math.cos(phaseShift - columnPhaseShift) + 1) * Note.halfWidth * keyCunt - returnReceptorToZeroOffsetX;
 			pos.x += offsetX * tornadoVal;
 		}
 
@@ -100,7 +98,7 @@ class PathModifier extends NoteModifier
 			var playerColumn = column % field.field.keyCount;
 			var columnPhaseShift = (playerColumn * PI_THIRD) + getSubmodValue("tornadoTanOffset", player);
 			var phaseShift = (diff / 135) * (1 + getSubmodValue("tornadoTanPeriod", player));
-			var returnReceptorToZeroOffsetX = (-cos(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
+			var returnReceptorToZeroOffsetX = (-Math.cos(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
 			var offsetX = (-tan(phaseShift - columnPhaseShift) + 1) * Note.halfWidth * keyCunt - returnReceptorToZeroOffsetX;
 			pos.x += offsetX * tornadoTanVal;
 		}
@@ -111,8 +109,8 @@ class PathModifier extends NoteModifier
 			var playerColumn = column % field.field.keyCount;
 			var columnPhaseShift = (playerColumn * PI_THIRD) + getSubmodValue("tornadoZOffset", player);
 			var phaseShift = (diff / 135) * (1 + getSubmodValue("tornadoZPeriod", player));
-			var returnReceptorToZeroOffsetX = (-sin(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
-			var offsetX = (-sin(phaseShift - columnPhaseShift) + 1) * Note.halfWidth * keyCunt - returnReceptorToZeroOffsetX;
+			var returnReceptorToZeroOffsetX = (-Math.sin(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
+			var offsetX = (-Math.sin(phaseShift - columnPhaseShift) + 1) * Note.halfWidth * keyCunt - returnReceptorToZeroOffsetX;
 			pos.z += offsetX * tornadoZVal;
 		}
 
@@ -122,8 +120,8 @@ class PathModifier extends NoteModifier
 			var playerColumn = column % field.field.keyCount;
 			var columnPhaseShift = (playerColumn * PI_THIRD) + getSubmodValue("tornadoTanZOffset", player) + Math.PI;
 			var phaseShift = (diff / 135) * (1 + getSubmodValue("tornadoTanZPeriod", player));
-			var returnReceptorToZeroOffsetX = (-sin(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
-			var offsetX = (-tan(phaseShift - columnPhaseShift) + 1) * Note.halfWidth * keyCunt - returnReceptorToZeroOffsetX;
+			var returnReceptorToZeroOffsetX = (-Math.sin(-columnPhaseShift) + 1) * Note.halfWidth * keyCunt;
+			var offsetX = (-Math.tan(phaseShift - columnPhaseShift) + 1) * Note.halfWidth * keyCunt - returnReceptorToZeroOffsetX;
 			pos.z += offsetX * tornadoTanZVal;
 		}
 		
@@ -149,7 +147,7 @@ class PathModifier extends NoteModifier
 				var period = getSubmodValue("itgTornadoPeriod", player);
 				var offset = getSubmodValue("itgTornadoOffset", player);
 				rads += (diff + offset) * (6 + period * 6) / FlxG.height;
-				var adjusted = CoolMath.scale(cos(rads), -1, 1, minX, maxX);
+				var adjusted = CoolMath.scale(Math.cos(rads), -1, 1, minX, maxX);
 				pos.x += (adjusted - realPixel) * itgTornadoVal;
 			}
 
@@ -169,7 +167,7 @@ class PathModifier extends NoteModifier
 			var period = this.getSubmodValue("digitalOffset", player);
 			var offset = this.getSubmodValue("digitalPeriod", player);
 
-			pos.x += (digitalVal * Note.halfWidth) * Math.floor(0.5 + (steps * FlxMath.fastSin(getDigitalAngle(diff, offset, period)))) / steps;
+			pos.x += (digitalVal * Note.halfWidth) * Math.floor(0.5 + (steps * Math.sin(getDigitalAngle(diff, offset, period)))) / steps;
 		}
 
 		var digitalZVal = getSubmodValue("digitalZ", player);
@@ -178,7 +176,7 @@ class PathModifier extends NoteModifier
 			var period = this.getSubmodValue("digitalZOffset", player);
 			var offset = this.getSubmodValue("digitalZPeriod", player);
 
-			pos.z += (digitalZVal * Note.halfWidth) * Math.floor(0.5 + (steps * FlxMath.fastSin(getDigitalAngle(diff, offset, period)))) / steps;
+			pos.z += (digitalZVal * Note.halfWidth) * Math.floor(0.5 + (steps * Math.sin(getDigitalAngle(diff, offset, period)))) / steps;
 		}
 
 		return pos;

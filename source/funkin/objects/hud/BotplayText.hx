@@ -21,7 +21,7 @@ class BotplayText extends FlxText
 	override function draw(){
 		if (PlayState.instance.cpuControlled){
 			botplaySine += 180 * FlxG.elapsed;
-			alpha = 1.0 - flixel.math.FlxMath.fastSin((Math.PI * botplaySine) / 180.0);
+			alpha = 1.0 - Math.sin((Math.PI * botplaySine) / 180.0);
 			super.draw();
 		}else{
 			botplaySine = 0.0;

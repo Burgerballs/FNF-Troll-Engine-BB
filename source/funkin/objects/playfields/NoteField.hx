@@ -236,6 +236,7 @@ class NoteField extends FieldBase
 				continue;
 			lookupMap.set(note, object);
 			drawQueue.push(object);
+			pos = null;
 		}
 
 
@@ -252,6 +253,7 @@ class NoteField extends FieldBase
 			object.zIndex += 0.5;
 			lookupMap.set(obj, object);
 			drawQueue.push(object);
+			pos = null;
 		}
 
 		// draw strumattachments
@@ -266,6 +268,7 @@ class NoteField extends FieldBase
 			object.zIndex += 0.5;
 			lookupMap.set(obj, object);
 			drawQueue.push(object);
+			pos = null;
 		}
 
 		if ((FlxG.state is PlayState))

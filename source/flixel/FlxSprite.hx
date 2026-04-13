@@ -403,7 +403,7 @@ class FlxSprite extends FlxObject
 		origin = FlxPoint.get();
 		scale = FlxPoint.get(1, 1);
 		_halfSize = FlxPoint.get();
-		_matrix = new FlxMatrix();
+		_matrix = FlxMatrix.get();
 		colorTransform = new ColorTransform();
 		_scaledOrigin = new FlxPoint();
 	}

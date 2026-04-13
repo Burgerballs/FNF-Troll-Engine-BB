@@ -2036,7 +2036,7 @@ class ExperimentalChartingState extends MusicBeatState
 				{
 					colorSine += elapsed;
 
-					var colorVal:Float = 0.7 + 0.3 * FlxMath.fastSin(Math.PI * colorSine);
+					var colorVal:Float = 0.7 + 0.3 * Math.sin(Math.PI * colorSine);
 					var colorVal:Int = Math.round(colorVal * 255);
 
 					note.color = FlxColor.fromRGB(colorVal, colorVal, colorVal, 255);

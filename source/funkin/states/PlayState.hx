@@ -3699,7 +3699,7 @@ class PlayState extends MusicBeatState
 			FlxTween.cancelTweensOf(timingTxt);
 			FlxTween.cancelTweensOf(timingTxt.scale);
 			
-			timingTxt.text = '${FlxMath.roundDecimal(hitDiff, 2)}ms';
+			timingTxt.text = '${hitDiff > 0 ? '+' : ''}${FlxMath.roundDecimal(hitDiff, 2)}ms';
 			timingTxt.screenCenter();
 			timingTxt.x += ClientPrefs.comboOffset[4];
 			timingTxt.y -= ClientPrefs.comboOffset[5];

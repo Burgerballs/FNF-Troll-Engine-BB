@@ -53,19 +53,19 @@ class SchmovinDrunkModifier extends NoteModifier {
 	override function getPos(visualDiff:Float, timeDiff:Float, beat:Float, pos:Vector3, data:Int, player:Int, obj:FlxSprite, field:NoteField)
 	{
 		pos.x += 
-			applyDrunk('', player, beat, visualDiff, data, field.field.keyCount, FlxMath.fastSin) +
-			applyTipsy('X', player, beat, visualDiff, data, field.field.keyCount, FlxMath.fastSin) +
-			applyBumpy('X', player, beat, visualDiff, data, FlxMath.fastSin);
+			applyDrunk('', player, beat, visualDiff, data, field.field.keyCount, Math.sin) +
+			applyTipsy('X', player, beat, visualDiff, data, field.field.keyCount, Math.sin) +
+			applyBumpy('X', player, beat, visualDiff, data, Math.sin);
 
 		pos.y += 
-			applyDrunk('Y', player, beat, visualDiff, data, field.field.keyCount, FlxMath.fastSin) +
-			applyTipsy('', player, beat, visualDiff, data, field.field.keyCount, FlxMath.fastSin) +
-			applyBumpy('Y', player, beat, visualDiff, data, FlxMath.fastSin);
+			applyDrunk('Y', player, beat, visualDiff, data, field.field.keyCount, Math.sin) +
+			applyTipsy('', player, beat, visualDiff, data, field.field.keyCount, Math.sin) +
+			applyBumpy('Y', player, beat, visualDiff, data, Math.sin);
 
 		pos.z += 
-			applyDrunk('Z', player, beat, visualDiff, data, field.field.keyCount, FlxMath.fastSin) +
-			applyTipsy('Z', player, beat, visualDiff, data, field.field.keyCount, FlxMath.fastSin) +
-			applyBumpy('', player, beat, visualDiff, data, FlxMath.fastSin);
+			applyDrunk('Z', player, beat, visualDiff, data, field.field.keyCount, Math.sin) +
+			applyTipsy('Z', player, beat, visualDiff, data, field.field.keyCount, Math.sin) +
+			applyBumpy('', player, beat, visualDiff, data, Math.sin);
 
 		pos.x += applyDrunk('Tan', player, beat, visualDiff, data, field.field.keyCount, CoolMath.fastTan)
 			+ applyTipsy('TanX', player, beat, visualDiff, data, field.field.keyCount, CoolMath.fastTan)

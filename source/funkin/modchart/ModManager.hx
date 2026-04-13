@@ -594,6 +594,8 @@ class ModManager {
 		}
 	}
 
+	var pos:Vector3 = new Vector3();
+
 	public function getPos(diff:Float, tDiff:Float, beat:Float, data:Int, player:Int, obj:NoteObject, field:NoteField, ?exclusions:Array<String>, ?pos:Vector3):Vector3
 	{
 		if (!obj.alive) 
@@ -601,16 +603,17 @@ class ModManager {
 
 		if (exclusions == null) 
 			exclusions = []; // since [] cant be a default value for.. some reason?? "its not constant!!" kys haxe
-		
-		if (pos == null)
-			pos = new Vector3();
+
+		if (pos != null)
+			this.pos = pos;
+		pos = null;
 
 		diff += (
 			(FlxMath.lerp(Note.swagWidth, Conductor.crotchet * 0.45 * (obj.objType == NOTE ? getNoteSpeed(cast obj, player, field.songSpeed) : getCMod(data, player, field.songSpeed) * getXMod(data, player)), getValue("movePathType", player))) * getValue("movePath", player)) + 
 			getValue("transformPath", player
 		); 
 		
-		pos.setTo(
+		this.pos.setTo(
 			Note.halfWidth + field.field.getBaseX(data),
 			Note.halfWidth + 50 + diff,
 			0
@@ -625,10 +628,10 @@ class ModManager {
 			
 			var mod:Modifier = notemodRegister.get(name);
 			if (mod != null && !mod.ignorePos())
-				pos = mod.getPos(diff, tDiff, beat, pos, data, player, obj, field);
+				this.pos = mod.getPos(diff, tDiff, beat, this.pos, data, player, obj, field);
 		}
 
-		return pos;
+		return this.pos;
 	}
 
 	public function getFieldZoom(zoom:Float, beat:Float, songPos:Float, player:Int, field:NoteField, ?exclusions:Array<String>):Float
@@ -672,6 +675,12 @@ class ModManager {
 		return vert;
 	}
 
+	var info:RenderInfo = {
+		alpha: 1,
+		glow: 0,
+		scale: FlxPoint.weak(0.7, 0.7)
+	};
+
 	public function getExtraInfo(diff:Float, tDiff:Float, beat:Float, ?info:RenderInfo, obj:NoteObject, player:Int, data:Int, ?exclusions:Array<String>):RenderInfo
 	{
 		if (!obj.active)
@@ -681,11 +690,13 @@ class ModManager {
 			exclusions = [];
 
 		if (info == null){
-			info = {
+			this.info = {
 				alpha: 1,
 				glow: 0,
 				scale: FlxPoint.weak(0.7, 0.7)
 			};
+		} else {
+			this.info = info;
 		}
 
 		for (name in getActiveMods(player))
@@ -698,7 +709,7 @@ class ModManager {
 
 			var mod:Modifier = notemodRegister.get(name);
 			if (mod != null && mod.isRenderMod())
-				info = mod.getExtraInfo(diff, tDiff, beat, info, obj, player, data);
+				info = mod.getExtraInfo(diff, tDiff, beat, this.info, obj, player, data);
 		}
 
 		return info;
