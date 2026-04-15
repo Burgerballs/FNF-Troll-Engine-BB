@@ -348,6 +348,7 @@ class ChartingState extends MusicBeatState
 		96,
 		192
 	];
+	public var curLayer:Int = 0;
 	
 	public var hitsoundVolume(default, set):Float = 1.0;
 	@:noCompletion function set_hitsoundVolume(val:Float){
@@ -473,7 +474,7 @@ class ChartingState extends MusicBeatState
 		}
 
 		loadTracks();
-/* 		fixEvents(); */
+		fixEvents();
 
 		plrHitsound = new FlxSound().loadEmbedded(Paths.sound("monoHitsound"));
 		plrHitsound.pan = -0.75;
@@ -736,13 +737,13 @@ class ChartingState extends MusicBeatState
 		add(progressBG);
 		add(progressBar);
 
-		zoomTxt = new FlxText(10, 180, 0, "Zoom: 1 / 1", 16);
+		zoomTxt = new FlxText(10, 200, 0, "Zoom: 1 / 1", 16);
 		zoomTxt.setFormat(null, 18, 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFF000000);
 		zoomTxt.borderSize = 2;
 		zoomTxt.scrollFactor.set();
 		add(zoomTxt);
 
-		quantTxt = new FlxText(10, 200, 0, "Beat Snap: " + quantNames[curQuant] , 16);
+		quantTxt = new FlxText(10, 220, 0, "Beat Snap: " + quantNames[curQuant] , 16);
 		quantTxt.setFormat(null, 18, 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFF000000);
 		quantTxt.borderSize = 2;
 		quantTxt.scrollFactor.set();
@@ -830,23 +831,8 @@ class ChartingState extends MusicBeatState
 		var eventsData:Array<Array<Dynamic>> = [];
 		for (event in rawEventsData)
 		{
-			var last = eventsData[eventsData.length - 1];
-			if (last == null)
-			{
-				eventsData.push(event);
-			}
-			else
-			{
-				if (Math.abs(last[0] - event[0]) <= Conductor.jackLimit)
-				{
-					var fuck:Array<Array<Dynamic>> = event[1];
-					for (shit in fuck)
-						eventsData[eventsData.length - 1][1].push(shit);
-				}
-				else
-				{
-					eventsData.push(event);
-				}
+			if (event.length == 2) {
+				event.push(0);
 			}
 		}
 
@@ -1167,7 +1153,7 @@ class ChartingState extends MusicBeatState
 					for (i in 0...event[1].length)
 					{
 						var eventToPush:Array<Dynamic> = event[1][i];
-						copiedEventArray.push([eventToPush[0], eventToPush[1], eventToPush[2]]);
+						copiedEventArray.push([eventToPush[0], eventToPush[1], eventToPush[2], eventToPush[3]]);
 					}
 					notesCopied.push([strumTime, -1, copiedEventArray]);
 				}
@@ -1196,7 +1182,7 @@ class ChartingState extends MusicBeatState
 						for (i in 0...note[2].length)
 						{
 							var eventToPush:Array<Dynamic> = note[2][i];
-							copiedEventArray.push([eventToPush[0], eventToPush[1], eventToPush[2]]);
+							copiedEventArray.push([eventToPush[0], eventToPush[1], eventToPush[2], eventToPush[3]]);
 						}
 						_song.events.push([newStrumTime, copiedEventArray]);
 					}
@@ -1298,7 +1284,7 @@ class ChartingState extends MusicBeatState
 						for (i in 0...event[1].length)
 						{
 							var eventToPush:Array<Dynamic> = event[1][i];
-							copiedEventArray.push([eventToPush[0], eventToPush[1], eventToPush[2]]);
+							copiedEventArray.push([eventToPush[0], eventToPush[1], eventToPush[2], eventToPush[3]]);
 						}
 						_song.events.push([strumTime, copiedEventArray]);
 					}
@@ -1479,11 +1465,15 @@ class ChartingState extends MusicBeatState
 	var descText:FlxText;
 	var selectedEventText:FlxText;
 
+ 	function isEvent(note:Dynamic) {
+		return Std.isOfType(note[1], Array);
+	}
+	
 	function setSelectedEventType(typeName:String)
 	{
 		if (curSelectedNote != null && eventStuff != null)
 		{
-			if (curSelectedNote[2] == null)
+			if (isEvent(curSelectedNote))
 				curSelectedNote[1][curEventSelected][0] = typeName;
 
 			updateGrid();
@@ -1583,7 +1573,7 @@ class ChartingState extends MusicBeatState
 		// New event buttons
 		var removeButton:FlxUIButton = newFlxUIButton(eventDropDown.x + eventDropDown.width + 10, eventDropDown.y, '-', function()
 		{
-			if(curSelectedNote != null && curSelectedNote[2] == null) //Is event note
+			if(curSelectedNote != null && isEvent(curSelectedNote)) //Is event note
 			{
 				if(curSelectedNote[1].length < 2)
 				{
@@ -1614,7 +1604,7 @@ class ChartingState extends MusicBeatState
 
 		var addButton:FlxUIButton = newFlxUIButton(removeButton.x + removeButton.width + 10, removeButton.y, '+', function()
 		{
-			if(curSelectedNote != null && curSelectedNote[2] == null) //Is event note
+			if(curSelectedNote != null && isEvent(curSelectedNote)) //Is event note
 			{
 				var eventsGroup:Array<Dynamic> = curSelectedNote[1];
 				eventsGroup.push(['', '', '']);
@@ -1633,7 +1623,7 @@ class ChartingState extends MusicBeatState
 
 		var moveLeftButton:FlxUIButton = newFlxUIButton(addButton.x + addButton.width + 20, addButton.y, '<', function()
 		{
-			if (curSelectedNote == null || curSelectedNote[2] != null) // Isn't event note
+			if (curSelectedNote == null || isEvent(curSelectedNote)) // Isn't event note
 				return;
 
 			if (FlxG.keys.pressed.SHIFT){
@@ -1657,7 +1647,7 @@ class ChartingState extends MusicBeatState
 
 		var moveRightButton:FlxUIButton = newFlxUIButton(moveLeftButton.x + moveLeftButton.width + 10, moveLeftButton.y, '>', function()
 		{
-			if (curSelectedNote == null || curSelectedNote[2] != null) // Isn't event note
+			if (curSelectedNote == null || isEvent(curSelectedNote)) // Isn't event note
 				return;
 
 			if (FlxG.keys.pressed.SHIFT)
@@ -1701,7 +1691,7 @@ class ChartingState extends MusicBeatState
 
 	function changeEventSelected(change:Int = 0)
 	{
-		if(curSelectedNote != null && curSelectedNote[2] == null) //Is event note
+		if(curSelectedNote != null && isEvent(curSelectedNote)) //Is event note
 		{
 			curEventSelected += change;
 			if(curEventSelected < 0) curEventSelected = Std.int(curSelectedNote[1].length) - 1;
@@ -2315,7 +2305,8 @@ class ChartingState extends MusicBeatState
 		"Time: " + Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2)) + " / " + Std.string(FlxMath.roundDecimal(inst.length / 1000, 2)) +
 		"\n\nSection: " + curSec +
 		"\nBeat: " + funkin.data.Highscore.floorDecimal(curDecBeat, 2) +
-		"\nStep: " + curStep;
+		"\nStep: " + curStep +
+		"\nEvent Layer: " + curLayer;
 
 		var playedSound:Array<Bool> = []; //Prevents ouchy GF sex sounds
 		var updateSelectedNote = curSelectedNote != null;
@@ -2326,7 +2317,7 @@ class ChartingState extends MusicBeatState
 				var columnToCheck:Int = note.column;
 				if(columnToCheck > -1 && note.mustPress != _song.notes[curSec].mustHitSection) columnToCheck += keyCount;
 
-				if (curSelectedNote[0] == note.strumTime && (curSelectedNote[2]==null ? columnToCheck<0 : curSelectedNote[1]==columnToCheck))
+				if (curSelectedNote[0] == note.strumTime && (isEvent(curSelectedNote) ? columnToCheck<0 : curSelectedNote[1]==columnToCheck))
 				{
 					colorSine += elapsed;
 
@@ -2419,7 +2410,7 @@ class ChartingState extends MusicBeatState
 
 	function updateKeys(elapsed:Float) {
 
-		if (FlxG.keys.justPressed.J && curSelectedNote != null && curSelectedNote[2] != null) {
+		if (FlxG.keys.justPressed.J && curSelectedNote != null && !isEvent(curSelectedNote)) {
 			var baba = curSelectedNote;
 			var bab = CoolMath.interpolateMass(curSelectedNote[0], curSelectedNote[0] + curSelectedNote[2], Std.int(curSelectedNote[2] / Conductor.stepCrochet * quantizationMult));
 			for (i in 0...bab.length - 1) {
@@ -2466,6 +2457,15 @@ class ChartingState extends MusicBeatState
 		if(FlxG.keys.justPressed.X && curZoom < zoomList.length-1) {
 			curZoom++;
 			updateZoom();
+		}
+
+		if(FlxG.keys.justPressed.O) {
+			--curLayer;
+			updateGrid();
+		}
+		if(FlxG.keys.justPressed.P) {
+			curLayer++;
+			updateGrid();
 		}
 
 		if (FlxG.keys.justPressed.TAB) {
@@ -2885,7 +2885,7 @@ class ChartingState extends MusicBeatState
 
 		if (note != null)
 		{
-			if (note[2] != null)
+			if (!isEvent(note))
 			{
 				if(note[2] == value)
 					return;
@@ -2980,7 +2980,7 @@ class ChartingState extends MusicBeatState
 	function updateNoteUI():Void
 	{
 		if (curSelectedNote != null) {
-			if(curSelectedNote[2] != null) {
+			if(!isEvent(curSelectedNote)) {
 				stepperSusLength.value = curSelectedNote[2];
 				if(curSelectedNote[3] != null) {
 					currentType = noteTypeMap.get(curSelectedNote[3]);
@@ -3076,9 +3076,9 @@ class ChartingState extends MusicBeatState
 		for (i in _song.events)
 		{
 			var t = fuckFloatingPoints(i[0]);
-			if(t >= startThing && t < endThing)
+			if(t >= startThing && t < endThing && i[2] == curLayer)
 			{
-				var note:Note = setupNoteData(i, false);
+				var note:Note = setupNoteData(i, false, true);
 				curRenderedNotes.add(note);
 
 				var text:String = 'Event: ' + note.eventName + ' (' + Math.floor(note.strumTime) + ' ms)' + '\nValue 1: ' + note.eventVal1 + '\nValue 2: ' + note.eventVal2;
@@ -3154,14 +3154,14 @@ class ChartingState extends MusicBeatState
 		#end
 	}
 
-	function setupNoteData(i:Array<Dynamic>, isNextSection:Bool):Note
+	function setupNoteData(i:Array<Dynamic>, isNextSection:Bool, event:Bool = false):Note
 	{
 		var daColumn = i[1];
 		var daStrumTime = i[0];
 		var daSus:Dynamic = i[2];
 
 		var note:Note = new Note(daStrumTime, daColumn % keyCount, null, false, daSus <= 0 ? TAP : HEAD, true);
-		if(daSus != null) { //Common note
+		if(!event) { //Common note
 			if(!Std.isOfType(i[3], String)) //Convert old note type to new note type format
 			{
 				i[3] = noteTypeIntMap.get(i[3]);
@@ -3175,13 +3175,16 @@ class ChartingState extends MusicBeatState
 			note.noteType = i[3];
 		} else { //Event note
 			note.loadGraphic(Paths.image('eventArrow'));
+			trace(i);
 			note.eventName = getEventName(i[1]);
 			note.eventLength = i[1].length;
+			note.layer = i[2] ?? 0;
 			if(i[1].length < 2)
 			{
 				note.eventVal1 = i[1][0][1];
 				note.eventVal2 = i[1][0][2];
 			}
+			daSus = 0;
 			note.column = -1;
 			daColumn = -1;
 		}
@@ -3313,7 +3316,7 @@ class ChartingState extends MusicBeatState
 		{
 			for (i in _song.events)
 			{
-				if(i != curSelectedNote && i[0] == note.strumTime)
+				if(i != curSelectedNote && i[0] == note.strumTime && i[2] == curLayer)
 				{
 					curSelectedNote = i;
 					curEventSelected = Std.int(curSelectedNote[1].length) - 1;
@@ -3392,7 +3395,7 @@ class ChartingState extends MusicBeatState
 		{
 			for (i in _song.events)
 			{
-				if(i[0] == note.strumTime)
+				if(i[0] == note.strumTime && note.layer == i[2])
 				{
 					if(i == curSelectedNote)
 					{
@@ -3447,12 +3450,12 @@ class ChartingState extends MusicBeatState
 		var isEvent:Bool = column < 0;
 
 		if (isEvent)
-		{
+		{ // Event note
 			var eventType:String = eventNameInput.text; //eventStuff[Std.parseInt(eventDropDown.selectedId)][0];
 			var text1:String = value1InputText.text;
 			var text2:String = value2InputText.text;
 
-			_song.events.push([noteStrum, [[eventType, text1, text2]]]);
+			_song.events.push([noteStrum, [[eventType, text1, text2]], curLayer]);
 			curSelectedNote = _song.events[_song.events.length - 1];
 			curEventSelected = 0;
 			changeEventSelected();

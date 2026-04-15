@@ -1,5 +1,6 @@
 package funkin.data;
 
+import cpp.Int8;
 import flixel.graphics.FlxGraphic;
 #if USING_MOONCHART
 import funkin.data.FNFTroll as SupportedFormat;
