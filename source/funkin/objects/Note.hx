@@ -45,7 +45,6 @@ class Note extends NoteObject
 {
 	public var holdGlow:Bool = true; // Whether holds should "glow" / increase in alpha when held
 	public var baseAlpha:Float = 1;
-	public var layer:Int = 0;
 
 	public static var spriteScale:Float = 0.7;
 	public static var swagWidth(default, set):Float = 160 * spriteScale;
