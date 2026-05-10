@@ -78,7 +78,6 @@ class FNFGame extends FlxGame
 		}
 	}
 
-	/*
 	public var f_ticks:Float = 0;
 	var f_startTime:Float = 0;
 	var f_total:Float = 0;
@@ -155,7 +154,6 @@ class FNFGame extends FlxGame
 			#end
 		}
 	}
-	*/
 
 	override function switchState():Void
 	{
@@ -191,12 +189,17 @@ class FNFGame extends FlxGame
 	}
 
 	public function set_framerate(v:Float) {
-		if (v > FlxG.drawFramerate) {
-			FlxG.updateFramerate = Math.ceil(v);
-			FlxG.drawFramerate = Math.ceil(v);
-		} else {
-			FlxG.drawFramerate = Math.ceil(v);
-			FlxG.updateFramerate = Math.ceil(v);
+		var fr = ClientPrefs.unlimited ? 100000 : v;
+
+		if (fr > FlxG.drawFramerate)
+		{
+			FlxG.updateFramerate = Math.floor(fr);
+			FlxG.drawFramerate = Math.floor(fr);
+		}
+		else
+		{
+			FlxG.drawFramerate = Math.floor(fr);
+			FlxG.updateFramerate = Math.floor(fr);
 		}
 	}
 

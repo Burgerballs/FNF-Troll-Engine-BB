@@ -323,6 +323,9 @@ class OptionsSubstate extends MusicBeatSubstate
 	{
 		switch (option)
 		{
+			case 'unlimited':
+				ClientPrefs.unlimited = val;
+				Main.game.set_framerate(ClientPrefs.framerate);
 			case 'useEpics':
 				checkWindows();
 			case 'showFPS':
@@ -416,13 +419,7 @@ class OptionsSubstate extends MusicBeatSubstate
 		switch (option)
 		{
 			case 'framerate':
-				if (newVal > FlxG.drawFramerate){
-					FlxG.updateFramerate = Math.floor(newVal);
-					FlxG.drawFramerate = Math.floor(newVal);
-				}else{
-					FlxG.drawFramerate = Math.floor(newVal);
-					FlxG.updateFramerate = Math.floor(newVal);
-				}
+				Main.game.set_framerate(newVal);
 			case 'epicWindow' | 'sickWindow' | 'goodWindow' | 'badWindow' | 'hitWindow':
 				checkWindows();
 
