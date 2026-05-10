@@ -1,5 +1,7 @@
 package funkin.states.options;
 
+import funkin.states.scripting.HScriptedSubstate;
+import funkin.states.scripting.HScriptedSubstate;
 import funkin.CoolUtil.overlapsMouse as overlaps;
 import funkin.states.options.*;
 import funkin.ClientPrefs;
@@ -359,19 +361,21 @@ class OptionsSubstate extends MusicBeatSubstate
 		}
 	}
 
+	public var replacementComboSubState:String = ''; // Path to a scripted substate
+
 	function onButtonPressed(option:String)
 	{
 		switch (option)
 		{
 			case 'customizeHUD':
-				if ((_parentState is OptionsState) && !FlxG.keys.pressed.SHIFT)
-					LoadingState.loadAndSwitchState(new NoteOffsetState());
-				else{
+				if (replacementComboSubState == '') {
 					openSubState(new ComboPositionSubstate(!optState ? 0x0 : Math.floor(0xFF * ClientPrefs.stageOpacity) * 0x1000000));
-					
-					this.persistentDraw = false;
-					this.subStateClosed.addOnce((_) -> this.persistentDraw = true);
+				} else {
+					openSubState(new HScriptedSubstate(Paths.getHScriptPath(replacementComboSubState)));
 				}
+				
+				this.persistentDraw = false;
+				this.subStateClosed.addOnce((_) -> this.persistentDraw = true);
 			case 'customizeColours':
 				var noteState = new NotesSubState();
 				openSubState(noteState);
