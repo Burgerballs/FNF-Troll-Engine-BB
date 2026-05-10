@@ -26,25 +26,17 @@ jobs:
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-      # Runs a set of commands using the runners shell
-      - name: Restore existing build cache for faster compilation
-        uses: actions/cache@v3
-        with:
-          # not caching the bin folder to prevent asset duplication and stuff like that
-          key: cache-build-windows
-          path: |
-            .haxelib/
-            export/release/windows/haxe/
-            export/release/windows/obj/
-          restore-keys: |
-            cache-build-windows
       - name: Install Haxelib
         run: |
           haxelib git hxcpp https://github.com/FunkinCrew/hxcpp bfe01edc20cdc54fe7f54f1f2124b8959646144c
           haxelib --always --quiet git grig.audio https://gitlab.com/haxe-grig/grig.audio.git
           haxelib --always --quiet install flixel 5.6.2
           haxelib git openfl https://github.com/FunkinCrew/openfl a85b45f21c7e1a4c19663a193bf4ea961faf0dfa
-          haxelib git lime https://github.com/FunkinCrew/lime 6421de16b9dfa4fb55c19f12db65d392a57585c8
+          haxelib git lime https://github.com/FunkinCrew/lime 6421de16b9dfa4fb55c19f12db65d392a57585c8'
+          cd .haxelib/lime/git/
+          git submodule update
+          cd ../../../
+          haxelib run lime rebuild cpp -clean
           haxelib --always --quiet install flixel-ui 2.6.2
           haxelib --always --quiet install flixel-addons 3.3.2
           haxelib --always --quiet git hscript https://github.com/nebulazorua/t-hscript
@@ -60,7 +52,7 @@ jobs:
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile
-        run: haxelib run lime build windows -Dartifact
+        run: haxelib run lime build windows
       - name: Publish Artifact
         uses: actions/upload-artifact@v4
         with:
