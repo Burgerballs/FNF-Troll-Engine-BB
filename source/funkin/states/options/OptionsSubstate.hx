@@ -135,7 +135,7 @@ class OptionsSubstate extends MusicBeatSubstate
 		],
 		"video" => [
 			["video", ["shaders", "showFPS", "fpsOpacity", "fpsBG", "fpsStyle"]],
-			["display", ["framerate", #if FUNNY_ALLOWED "bread" #end]],
+			["display", ["framerate", 'unlimited', #if FUNNY_ALLOWED "bread" #end]],
 			[
 				"performance",
 				[

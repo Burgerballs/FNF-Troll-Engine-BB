@@ -166,7 +166,7 @@ class FPS extends TextField
 			text += '\nState: $currentState';
 			#end
 
-			if (currentFPS <= FlxG.drawFramerate * 0.5)
+			if (currentFPS <= FlxG.drawFramerate * 0.5 && !ClientPrefs.unlimited)
 				textColor = 0xFFFF0000;
 			else
 				textColor = 0xFFFFFFFF;

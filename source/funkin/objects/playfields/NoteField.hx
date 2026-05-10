@@ -157,7 +157,7 @@ class NoteField extends FieldBase
 				
 				var speed:Float = modManager.getNoteSpeed(daNote, modNumber, songSpeed);
 				var visPos:Float = (daNote.visualTime - Conductor.visualPosition) * speed;
-				if (visPos > drawDist)
+				if (Math.abs(visPos) > drawDist)
 					continue; // don't draw
 
 				if (!daNote.copyX && !daNote.copyY) {

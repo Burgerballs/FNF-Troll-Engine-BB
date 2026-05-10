@@ -574,6 +574,13 @@ Enabling Quants will change the logic to visualise the colors of the judgement y
 				value: false,
 				data: []
 			},
+			"unlimited" => {
+				display: "Uncapped FPS",
+				desc: "When toggled, the FPS has no limit.",
+				type: Toggle,
+				value: false,
+				data: []
+			},
 			"gradeSet" => {
 				display: "Grade Set",
 				desc: "What set of grades to use to rank performance ingame. Does not affect scores",
@@ -1072,15 +1079,17 @@ Enabling Quants will change the logic to visualise the colors of the judgement y
 		discordRPC ? DiscordClient.start() : DiscordClient.shutdown();	
 		#end
 
-		if (framerate > FlxG.drawFramerate)
+		var fr = unlimited ? 100000 : framerate;
+
+		if (fr > FlxG.drawFramerate)
 		{
-			FlxG.updateFramerate = Math.floor(framerate);
-			FlxG.drawFramerate = Math.floor(framerate);
+			FlxG.updateFramerate = Math.floor(fr);
+			FlxG.drawFramerate = Math.floor(fr);
 		}
 		else
 		{
-			FlxG.drawFramerate = Math.floor(framerate);
-			FlxG.updateFramerate = Math.floor(framerate);
+			FlxG.drawFramerate = Math.floor(fr);
+			FlxG.updateFramerate = Math.floor(fr);
 		}
 
 		Main.downloadBetas = Version.isBeta || ClientPrefs.downloadBetas;

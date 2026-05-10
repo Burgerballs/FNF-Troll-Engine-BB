@@ -1,28 +1,13 @@
 package funkin;
 
-import Main.resetSpriteCache;
 import funkin.scripts.Globals;
 import funkin.states.MusicBeatState;
-
 import flixel.util.typeLimit.NextState;
+import flixel.input.keyboard.FlxKey;
 
-#if CRASH_HANDLER
-import haxe.CallStack;
-import openfl.events.UncaughtErrorEvent;
+import lime.app.Application.current as application;
 
-#if SAVE_CRASH_LOGS
-import sys.io.File;
-#end
-
-#if sys
-import lime.system.System;
-#end
-
-#if (windows && cpp)
-import funkin.api.Windows;
-#end
-
-#end
+import openfl.events.KeyboardEvent;
 
 #if SCRIPTABLE_STATES
 import funkin.states.scripting.HScriptOverridenState;
@@ -30,59 +15,70 @@ import funkin.states.scripting.HScriptOverridenState;
 
 class FNFGame extends FlxGame
 {
+	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
+	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
+	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
+	public static var specialKeysEnabled(default, set):Bool;
+
 	public function new(gameWidth = 0, gameHeight = 0, ?initialState:InitialState, updateFramerate = 60, drawFramerate = 60, skipSplash = false, ?startFullscreen:Bool)
 	{
 		@:privateAccess FlxG.initSave();
 		startFullscreen = startFullscreen ?? FlxG.save.data.fullscreen;
 
 		super(gameWidth, gameHeight, initialState, updateFramerate, drawFramerate, skipSplash, startFullscreen);
-		_customSoundTray = flixel.system.ui.DefaultFlxSoundTray;
 
 		FlxG.sound.volume = FlxG.save.data.volume;
 		FlxG.mouse.useSystemCursor = true;
-		
+		FlxG.mouse.visible = false;
 
-		// shader coords fix
-		function resetSpriteCaches() {
-			for (cam in FlxG.cameras.list) {
-				if (cam != null && cam.filters != null)
-					resetSpriteCache(cam.flashSprite);
-			}
-			resetSpriteCache(this);
-		}
+		////
+		FlxG.signals.gameResized.add((w, h) -> resetSpriteCache());
+		FlxG.signals.focusGained.add(resetSpriteCache);
 
-		FlxG.signals.gameResized.add((w, h) -> resetSpriteCaches());
-		FlxG.signals.focusGained.add(resetSpriteCaches);
-
-		#if CRASH_HANDLER
-		openfl.Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(
-			UncaughtErrorEvent.UNCAUGHT_ERROR, 
-			function(event:UncaughtErrorEvent) {
-				// one of these oughta do it
-				event.stopImmediatePropagation();
-				event.stopPropagation();
-				event.preventDefault();
-				onCrash(event.error);
-			}
+		////
+		FlxG.stage.addEventListener(
+			KeyboardEvent.KEY_DOWN, 
+			_onKeyPress, 
+			false, 
+			100
 		);
 
-		#if cpp
-		untyped __global__.__hxcpp_set_critical_error_handler(onCrash);
-		#end
-		#end
+		FlxG.stage.addEventListener(
+			openfl.events.FullScreenEvent.FULL_SCREEN, 
+			(e) -> FlxG.save.data.fullscreen = e.fullScreen
+		);
 	}
 
-	override function update():Void
-	{
-		super.update();
-
-		if (FlxG.keys.justPressed.F5)
-			if(FlxG.keys.pressed.SHIFT)
-				FlxG.switchState(new funkin.states.MainMenuState());
-			else
-				MusicBeatState.resetState();
+	private function _onKeyPress(e:KeyboardEvent) {
+		switch (e.keyCode:FlxKey) {
+			#if (windows || linux) // No idea if this also applies to any other targets
+			case ENTER:
+				// Prevent Flixel from listening to key inputs when pressing Alt+Enter
+				if (e.altKey)
+					e.stopImmediatePropagation();
+			#end
+			case F11:
+				FlxG.fullscreen = !FlxG.fullscreen;
+			case F3:
+				if (!Main.fpsVar.visible) {
+					Main.fpsVar.visible = true;
+				}else {
+					Main.fpsVar.visible = false;
+				}
+			case F5:
+				if (e.shiftKey) {
+					funkin.Paths.clearStoredMemory();
+					funkin.Paths.clearUnusedMemory();
+					if (_state != null) _state.visible = false;
+					MusicBeatState.switchState(new funkin.states.MainMenuState());
+				}else {
+					MusicBeatState.resetState();
+				}
+			default:
+		}
 	}
 
+	/*
 	public var f_ticks:Float = 0;
 	var f_startTime:Float = 0;
 	var f_total:Float = 0;
@@ -159,6 +155,7 @@ class FNFGame extends FlxGame
 			#end
 		}
 	}
+	*/
 
 	override function switchState():Void
 	{
@@ -179,57 +176,43 @@ class FNFGame extends FlxGame
 		super.switchState();
 	}
 
-	#if CRASH_HANDLER
-	private function onCrash(errorName:String):Void {
-		print("\nCall stack starts below");
-
-		var callstack:String = Main.callstackToString(CallStack.exceptionStack(true));
-		print('\n$callstack\n$errorName');
-
-		////
-		var boxMessage:String = '$callstack\n$errorName';
-
-		#if SAVE_CRASH_LOGS
-		final fileName:String = "crash.txt";
-		boxMessage += '\nCall stack was saved as $fileName';
-		File.saveContent(fileName, callstack);
-		#end
-
-		#if WINDOWS_CRASH_HANDLER
-		boxMessage += "\nWould you like to goto the main menu?";
-		var ret = Windows.msgBox(boxMessage, errorName, ERROR | MessageBoxOptions.YESNOCANCEL | MessageBoxDefaultButton.BUTTON3);
-		
-		switch(ret) {
-			case YES: 
-				toMainMenu();
-				return;
-			case CANCEL: 
-				// Continue with a possibly unstable state
-				return;
-			default:
-				// Close the game
+	// shader coords fix
+	public function resetSpriteCache() {
+		for (cam in FlxG.cameras.list) {
+			if (cam != null && cam.filters != null)
+				Main.resetSpriteCache(cam.flashSprite);
 		}
-		#else
-		lime.app.Application.current.window.alert(callstack, errorName);
-		#end
-
-		#if sys 
-		System.exit(1);
-		#end
+		Main.resetSpriteCache(this);
 	}
 
-	@:unreflective private function toMainMenu() {
-		try{
-			if (_state != null) {
-				_state.destroy();
-				_state = null;
-			}
-		}catch(e){
-			print("Error destroying state: ", e);
-		}	
-		
-		FlxG.game._nextState = new funkin.states.MainMenuState();
-		FlxG.game.switchState();
+	public function set_antialiasing(v:Bool) {
+		FlxG.stage.quality = v ? BEST : LOW; // This affects ShaderFilter quality :o
+		FlxSprite.defaultAntialiasing = v;
 	}
-	#end
+
+	public function set_framerate(v:Float) {
+		if (v > FlxG.drawFramerate) {
+			FlxG.updateFramerate = Math.ceil(v);
+			FlxG.drawFramerate = Math.ceil(v);
+		} else {
+			FlxG.drawFramerate = Math.ceil(v);
+			FlxG.updateFramerate = Math.ceil(v);
+		}
+	}
+
+	@:noCompletion inline public static function set_specialKeysEnabled(val)
+	{
+		if (val) {
+			FlxG.sound.muteKeys = muteKeys;
+			FlxG.sound.volumeDownKeys = volumeDownKeys;
+			FlxG.sound.volumeUpKeys = volumeUpKeys;
+		}
+		else {
+			FlxG.sound.muteKeys = [];
+			FlxG.sound.volumeDownKeys = [];
+			FlxG.sound.volumeUpKeys = [];
+		}
+
+		return specialKeysEnabled = val;
+	}
 }
