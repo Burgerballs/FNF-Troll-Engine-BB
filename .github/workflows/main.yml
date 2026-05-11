@@ -33,6 +33,9 @@ jobs:
           haxelib --always --quiet install flixel 5.6.2 --skip-dependencies
           haxelib git openfl https://github.com/FunkinCrew/openfl a85b45f21c7e1a4c19663a193bf4ea961faf0dfa
           haxelib git lime https://github.com/FunkinCrew/lime 6421de16b9dfa4fb55c19f12db65d392a57585c8
+          cd .haxelib/hxcpp/git/tools/hxcpp
+          haxe compile.hxml
+          cd ../../../../..
           cd .haxelib/lime/git/
           git submodule update
           cd ../../../
