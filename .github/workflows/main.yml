@@ -28,6 +28,7 @@ jobs:
           haxe-version: 4.3.6
       - name: Install Haxelib
         run: |
+          haxelib newrepo
           haxelib git hxcpp https://github.com/FunkinCrew/hxcpp bfe01edc20cdc54fe7f54f1f2124b8959646144c
           haxelib --always --quiet git grig.audio https://gitlab.com/haxe-grig/grig.audio.git
           haxelib --always --quiet install flixel 5.6.2 --skip-dependencies
