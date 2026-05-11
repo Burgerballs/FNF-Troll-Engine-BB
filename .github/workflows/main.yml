@@ -32,7 +32,7 @@ jobs:
           haxelib --always --quiet git grig.audio https://gitlab.com/haxe-grig/grig.audio.git
           haxelib --always --quiet install flixel 5.6.2 --skip-dependencies
           haxelib git openfl https://github.com/FunkinCrew/openfl a85b45f21c7e1a4c19663a193bf4ea961faf0dfa
-          haxelib git lime https://github.com/FunkinCrew/lime 6421de16b9dfa4fb55c19f12db65d392a57585c8'
+          haxelib git lime https://github.com/FunkinCrew/lime 6421de16b9dfa4fb55c19f12db65d392a57585c8
           cd .haxelib/lime/git/
           git submodule update
           cd ../../../
