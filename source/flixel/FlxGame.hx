@@ -1,5 +1,7 @@
 package flixel;
 
+import flixel.system.ui.DefaultFlxSoundTray;
+import flixel.system.ui.DefaultFlxSoundTray;
 import flixel.graphics.tile.FlxDrawBaseItem;
 import flixel.system.FlxSplash;
 import flixel.util.FlxArrayUtil;
@@ -339,18 +341,12 @@ class FlxGame extends Sprite
 		addChild(debugger);
 		#end
 
-		// No need for overlays on mobile.
-		#if !mobile
-		// Volume display tab
-		#if FLX_SOUND_TRAY
-		soundTray = Type.createInstance(_customSoundTray, []);
+		soundTray = new DefaultFlxSoundTray();
 		addChild(soundTray);
-		#end
 
 		#if FLX_FOCUS_LOST_SCREEN
 		_focusLostScreen = Type.createInstance(_customFocusLostScreen, []);
 		addChild(_focusLostScreen);
-		#end
 		#end
 
 		// Focus gained/lost monitoring
