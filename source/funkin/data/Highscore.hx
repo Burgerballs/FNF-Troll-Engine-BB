@@ -35,7 +35,6 @@ typedef ScoreRecord = {
 
 class Highscore {
 	static final accSystems:Map<String, String> = [
-		"" => "Simple",
 		"Simple" => "",
 		"" => "Judgement",
 		"Judgement" => "",
