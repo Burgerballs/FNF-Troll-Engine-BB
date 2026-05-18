@@ -509,7 +509,6 @@ Enabling Quants will change the logic to visualise the colors of the judgement y
 				value: "BBE2Complex",
 				data: [
 					"options" => [
-						"Simple",
 						"Judgement",
 						"Wife3",
 						"PBot",

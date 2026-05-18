@@ -266,15 +266,6 @@ class Stats {
 	public function calculateAccuracy(data:JudgmentData, diff:Float, ?incrementPlayed:Bool = true) {
 		switch(accuracySystem)
 		{
-			case SIMPLE: // -1 acc if breaks combo, +1 otherwise
-				if(data.comboBehaviour == BREAK)
-					totalNotesHit--;
-				else
-					totalNotesHit++;
-
-				if(data.countAsHit != false)
-					totalPlayed++;
-
 			case WIFE3: // Milisecond-based accuracy, using Etterna's Wife3 algorithm
 				if (data.wifePoints == null)
 					totalNotesHit += Wife3.getAcc(diff);
