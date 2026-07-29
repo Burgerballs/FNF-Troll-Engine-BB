@@ -65,7 +65,7 @@ class KeyHint extends FlxTypedSpriteGroup<FlxSprite> {
         curKey = FlxMath.wrap(curKey+1, 0, keys.length - 1);
         keyText.text = InputFormatter.getKeyName(keys[curKey]);
         var predictedWidth = keyText.width + 4 >= min_width ? keyText.width + 4 : min_width;
-        FlxTween.tween(actionText, {x: border.x + predictedWidth + 2}, 1, {ease: FlxEase.backInOut});
+        FlxTween.tween(actionText, {x: border.x + predictedWidth}, 1, {ease: FlxEase.backInOut});
         FlxTween.num(border.width, predictedWidth, 1, {ease: FlxEase.backInOut}, widthChange.bind(border));
         FlxTween.tween(keyText, {alpha: 1}, 0.6, {startDelay: 0.2});
         timerLoop();

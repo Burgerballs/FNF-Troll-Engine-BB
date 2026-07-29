@@ -16,20 +16,18 @@ using StringTools;
 //todo: devise a plan that doesn't make me want to blow up when programming this.
 typedef PsychEngineStagePropGeneric = {
 	type:String,
-	scale:Array<Float>,
-	scroll:Array<Float>,
-	x:Float,
-	y:Float,
+	?name:String,
+	?image:String,
+	?scale:Array<Float>,
+	?scroll:Array<Float>,
+	?x:Float,
+	?y:Float,
 	?flipX:Bool,
 	?flipY:Bool,
-	antialiasing:Bool,
-	color:String,
-	alpha:Float,
-	angle:Float
-
-}
-typedef PsychEngineStagePropSquare = {
-	color:String
+	?antialiasing:Bool,
+	?color:String,
+	?alpha:Float,
+	?angle:Float
 }
 
 typedef VSliceStageProp = {
@@ -113,6 +111,9 @@ typedef StageFile =
 	var opponent:Array<Dynamic>;
 	@:optional var props:Array<StagePropData>;
 
+	// 1.0 compat for nematodes and other mods
+	@:optional var objects:Array<PsychEngineStagePropGeneric>;
+
 	@:optional var hide_girlfriend:Bool;
 
 	@:optional var camera_boyfriend:Array<Float>;
@@ -179,6 +180,26 @@ class StageProp extends FlxSprite {
 			nextDanceBeat = Conductor.curBeat;
 
 		super.update(elapsed);
+	}
+
+	public static function buildFromV1(propData:PsychEngineStagePropGeneric) {
+		var prop:StageProp = new StageProp(propData.x ?? 0.0, propData.y ?? 0.0);
+		if (propData.type == 'sprite') {
+			prop.loadGraphic(Paths.image(propData.image));
+			trace(propData.image);
+			if (propData.scale != null)
+				prop.scale.set(propData.scale[0], propData.scale[1]);
+			prop.updateHitbox();
+			prop.alpha = propData?.alpha ?? 1.0;
+			prop.flipX = propData?.flipX ?? false;
+			prop.flipY = propData?.flipY ?? false;
+
+			if(propData.scroll != null)
+				prop.scrollFactor.set(propData.scroll[0], propData.scroll[1]);
+
+			prop.antialiasing = propData?.antialiasing ?? false;
+		}
+		return prop;
 	}
 
 	public static function buildFromData(propData:StagePropData) {
@@ -356,6 +377,30 @@ class Stage extends FlxTypedGroup<FlxBasic>
 						foreground.insert(propData?.index ?? foreground.members.length, prop);
 					else
 						insert(propData?.index ?? members.length, prop);
+				}
+			}
+
+			var inForeground:Bool = false;
+			if (stageData.objects != null) { // For Nematodes
+				for (propData in stageData.objects) {
+
+					if (propData.type == 'boyfriend' || propData.type == 'gf' || propData.type == 'dad')  {
+						inForeground = true;
+						continue;
+						// i have no patience to do some addbehindgf bullshit
+					}
+
+					var prop:StageProp = StageProp.buildFromV1(propData);
+					if (propData.name != null)
+						props.set(propData.name, prop);
+
+					trace(propData.name, 'Added!');
+
+					if (inForeground) {
+						foreground.insert(foreground.members.length, prop);
+					} else {
+						insert(members.length, prop);
+					}
 				}
 			}
 

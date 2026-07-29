@@ -16,6 +16,8 @@ class FNFHealthBar extends FlxBar{
 	var rightIcon:HealthIcon;
 
 	public var iconOffset:Int = 26;
+	public var marginX = 5;
+	public var marginY = 5;
 
 	public var isOpponentMode:Bool = false; // going insane
 
@@ -91,9 +93,9 @@ class FNFHealthBar extends FlxBar{
 
 
 		super(
-			healthBarBG.x + 5, healthBarBG.y + 5,
+			healthBarBG.x + marginX, healthBarBG.y + marginY,
 			isOpponentMode ? LEFT_TO_RIGHT : RIGHT_TO_LEFT, // changing this later on breaks the bar visually idk why
-			Std.int(healthBarBG.width - 10), Std.int(healthBarBG.height -	 10),
+			Std.int(healthBarBG.width - (marginX*2)), Std.int(healthBarBG.height -	 (marginY*2)),
 			null, null,
 			minHealth, maxHealth
 		);
@@ -194,7 +196,7 @@ class FNFHealthBar extends FlxBar{
 			return;
 		}
 
-		healthBarBG.setPosition(x - 5, y - 5);
+		healthBarBG.setPosition(x - marginX, y - marginY);
 
 		updateIcons(elapsed);
 
